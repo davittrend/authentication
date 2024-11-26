@@ -1,45 +1,30 @@
 import React from 'react';
-import { LogIn, LogOut } from 'lucide-react';
-import useAuthStore from '../store/authStore';
+import { Loader } from 'lucide-react';
 
-// These values should match your Pinterest Developer App settings
-const PINTEREST_CLIENT_ID = '1507772';
-const REDIRECT_URI = 'https://adorable-shortbread-ea235b.netlify.app/callback';
-const SCOPE = 'boards:read,pins:read,pins:write';
-const STATE = crypto.randomUUID(); // Generate random state for security
+interface AuthButtonProps {
+  isLoading: boolean;
+  onClick: () => void;
+}
 
-export default function AuthButton() {
-  const { isAuthenticated, clearAuth } = useAuthStore();
-
-  const handleLogin = () => {
-    // Store state in sessionStorage to verify when returning
-    sessionStorage.setItem('pinterest_auth_state', STATE);
-    
-    const authUrl = `https://www.pinterest.com/oauth/?` + 
-      `client_id=${PINTEREST_CLIENT_ID}&` +
-      `redirect_uri=${encodeURIComponent(REDIRECT_URI)}&` +
-      `response_type=code&` +
-      `scope=${encodeURIComponent(SCOPE)}&` +
-      `state=${STATE}`;
-
-    window.location.href = authUrl;
-  };
-
-  return isAuthenticated ? (
+export function AuthButton({ isLoading, onClick }: AuthButtonProps) {
+  return (
     <button
-      onClick={clearAuth}
-      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+      onClick={onClick}
+      disabled={isLoading}
+      className={`w-full py-3 px-4 rounded-lg text-white font-medium transition-all
+        ${isLoading 
+          ? 'bg-gray-400 cursor-not-allowed' 
+          : 'bg-red-500 hover:bg-red-600 active:bg-red-700'
+        }`}
     >
-      <LogOut className="h-4 w-4 mr-2" />
-      Disconnect Pinterest
-    </button>
-  ) : (
-    <button
-      onClick={handleLogin}
-      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-    >
-      <LogIn className="h-4 w-4 mr-2" />
-      Connect Pinterest
+      {isLoading ? (
+        <span className="flex items-center justify-center">
+          <Loader className="animate-spin h-5 w-5 mr-3" />
+          Connecting...
+        </span>
+      ) : (
+        'Connect Pinterest Account'
+      )}
     </button>
   );
 }

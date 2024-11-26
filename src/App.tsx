@@ -1,27 +1,31 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
-import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import Callback from './pages/Callback';
-import SchedulePins from './pages/SchedulePins';
-import ScheduledPins from './pages/ScheduledPins';
-import AddAccount from './pages/AddAccount';
+import { Toaster } from 'react-hot-toast';
+import { Header } from './components/Header';
+import { Features } from './components/Features';
+import { AuthButton } from './components/AuthButton';
+import { Footer } from './components/Footer';
+import { useAuth } from './hooks/useAuth';
 
 function App() {
+  const { isLoading, isAuthenticated, handleAuth } = useAuth();
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/callback" element={<Callback />} />
-        <Route element={<Layout />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/schedule-pins" element={<SchedulePins />} />
-          <Route path="/scheduled-pins" element={<ScheduledPins />} />
-          <Route path="/accounts/add" element={<AddAccount />} />
-        </Route>
-      </Routes>
-    </Router>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
+      <Toaster position="top-center" />
+      
+      <div className="container mx-auto px-4 py-16">
+        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+          <Header />
+          <div className="p-8">
+            <Features isAuthenticated={isAuthenticated} />
+            <div className="mt-6">
+              <AuthButton isLoading={isLoading} onClick={handleAuth} />
+            </div>
+            <Footer />
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
