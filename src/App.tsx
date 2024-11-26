@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import HomePage from './pages/HomePage';
 import CallbackPage from './pages/CallbackPage';
+import DashboardPage from './pages/DashboardPage';
+import ScheduledPinsPage from './pages/ScheduledPinsPage';
+import SettingsPage from './pages/SettingsPage';
 
 function App() {
   return (
@@ -29,6 +32,9 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/callback" element={<CallbackPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/dashboard/scheduled" element={<ScheduledPinsPage />} />
+        <Route path="/dashboard/settings" element={<SettingsPage />} />
       </Routes>
     </BrowserRouter>
   );
