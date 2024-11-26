@@ -1,31 +1,36 @@
 import React from 'react';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
-import { Header } from './components/Header';
-import { Features } from './components/Features';
-import { AuthButton } from './components/AuthButton';
-import { Footer } from './components/Footer';
-import { useAuth } from './hooks/useAuth';
+import HomePage from './pages/HomePage';
+import CallbackPage from './pages/CallbackPage';
 
 function App() {
-  const { isLoading, isAuthenticated, handleAuth } = useAuth();
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
-      <Toaster position="top-center" />
-      
-      <div className="container mx-auto px-4 py-16">
-        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
-          <Header />
-          <div className="p-8">
-            <Features isAuthenticated={isAuthenticated} />
-            <div className="mt-6">
-              <AuthButton isLoading={isLoading} onClick={handleAuth} />
-            </div>
-            <Footer />
-          </div>
-        </div>
-      </div>
-    </div>
+    <BrowserRouter>
+      <Toaster 
+        position="top-center"
+        toastOptions={{
+          duration: 5000,
+          success: {
+            style: {
+              background: '#10B981',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#EF4444',
+              color: 'white',
+            },
+            duration: 6000,
+          },
+        }}
+      />
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/callback" element={<CallbackPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

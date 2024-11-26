@@ -2,7 +2,7 @@ import { Handler } from '@netlify/functions';
 
 const clientId = '1507772';
 const clientSecret = '12e86e7dd050a39888c5e753908e80fae94f7367';
-const redirectUri = process.env.REDIRECT_URI || 'http://localhost:8888/.netlify/functions/pinterest-auth';
+const redirectUri = process.env.REDIRECT_URI || 'https://adorable-shortbread-ea235b.netlify.app/callback';
 
 export const handler: Handler = async (event) => {
   if (event.queryStringParameters?.code) {
@@ -22,11 +22,17 @@ export const handler: Handler = async (event) => {
         }),
       });
 
-      if (!tokenResponse.ok) {
-        throw new Error(`Token exchange failed: ${await tokenResponse.text()}`);
-      }
-
       const tokenData = await tokenResponse.json();
+
+      if (!tokenResponse.ok) {
+        console.error('Token error:', tokenData);
+        return {
+          statusCode: tokenResponse.status,
+          body: JSON.stringify({
+            error: tokenData.error_description || tokenData.error || 'Failed to exchange token',
+          }),
+        };
+      }
 
       const userResponse = await fetch('https://api.pinterest.com/v5/user_account', {
         headers: {
@@ -34,41 +40,32 @@ export const handler: Handler = async (event) => {
         },
       });
 
-      if (!userResponse.ok) {
-        throw new Error(`User info failed: ${await userResponse.text()}`);
-      }
-
       const userData = await userResponse.json();
+
+      if (!userResponse.ok) {
+        console.error('User info error:', userData);
+        return {
+          statusCode: userResponse.status,
+          body: JSON.stringify({
+            error: userData.message || 'Failed to fetch user information',
+          }),
+        };
+      }
 
       return {
         statusCode: 200,
-        headers: {
-          'Content-Type': 'text/html',
-        },
-        body: `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <title>Authentication Successful</title>
-              <script>
-                window.opener.postMessage({ type: 'PINTEREST_AUTH_SUCCESS', data: ${JSON.stringify({
-                  token: tokenData,
-                  user: userData,
-                })} }, '*');
-                window.close();
-              </script>
-            </head>
-            <body>
-              <h1>Authentication successful! You can close this window.</h1>
-            </body>
-          </html>
-        `,
+        body: JSON.stringify({
+          token: tokenData,
+          user: userData,
+        }),
       };
     } catch (error) {
       console.error('Auth error:', error);
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: 'Authentication failed' }),
+        body: JSON.stringify({ 
+          error: error instanceof Error ? error.message : 'Authentication failed',
+        }),
       };
     }
   }
