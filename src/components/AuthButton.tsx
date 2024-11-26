@@ -1,12 +1,38 @@
 import React from 'react';
-import { Loader } from 'lucide-react';
+import { Loader, LogOut, User } from 'lucide-react';
 
 interface AuthButtonProps {
   isLoading: boolean;
+  isAuthenticated: boolean;
   onClick: () => void;
+  onLogout?: () => void;
+  username?: string;
 }
 
-export function AuthButton({ isLoading, onClick }: AuthButtonProps) {
+export function AuthButton({ isLoading, isAuthenticated, onClick, onLogout, username }: AuthButtonProps) {
+  if (isAuthenticated && username) {
+    return (
+      <div className="space-y-4">
+        <div className="p-4 bg-red-50 rounded-lg flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <User className="w-5 h-5 text-red-500" />
+            <div>
+              <p className="text-sm text-gray-600">Connected as</p>
+              <p className="font-medium text-gray-900">{username}</p>
+            </div>
+          </div>
+          <button
+            onClick={onLogout}
+            className="p-2 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+            title="Disconnect account"
+          >
+            <LogOut className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <button
       onClick={onClick}

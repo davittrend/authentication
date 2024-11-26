@@ -2,9 +2,38 @@ import { Handler } from '@netlify/functions';
 
 const clientId = '1507772';
 const clientSecret = '12e86e7dd050a39888c5e753908e80fae94f7367';
-const redirectUri = process.env.REDIRECT_URI || 'https://adorable-shortbread-ea235b.netlify.app/callback';
+const redirectUri = 'https://adorable-shortbread-ea235b.netlify.app/callback';
 
 export const handler: Handler = async (event) => {
+  // Enable CORS
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
+  };
+
+  // Handle preflight requests
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 204,
+      headers,
+      body: ''
+    };
+  }
+
+  const path = event.queryStringParameters?.path;
+
+  if (path === '/oauth/url') {
+    const scope = 'boards:read,pins:read,pins:write,user_accounts:read,boards:write';
+    const authUrl = `https://www.pinterest.com/oauth/?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
+    
+    return {
+      statusCode: 200,
+      headers,
+      body: JSON.stringify({ url: authUrl })
+    };
+  }
+
   if (event.queryStringParameters?.code) {
     const code = event.queryStringParameters.code;
     
@@ -28,6 +57,7 @@ export const handler: Handler = async (event) => {
         console.error('Token error:', tokenData);
         return {
           statusCode: tokenResponse.status,
+          headers,
           body: JSON.stringify({
             error: tokenData.error_description || tokenData.error || 'Failed to exchange token',
           }),
@@ -46,6 +76,7 @@ export const handler: Handler = async (event) => {
         console.error('User info error:', userData);
         return {
           statusCode: userResponse.status,
+          headers,
           body: JSON.stringify({
             error: userData.message || 'Failed to fetch user information',
           }),
@@ -54,6 +85,7 @@ export const handler: Handler = async (event) => {
 
       return {
         statusCode: 200,
+        headers,
         body: JSON.stringify({
           token: tokenData,
           user: userData,
@@ -63,6 +95,7 @@ export const handler: Handler = async (event) => {
       console.error('Auth error:', error);
       return {
         statusCode: 500,
+        headers,
         body: JSON.stringify({ 
           error: error instanceof Error ? error.message : 'Authentication failed',
         }),
@@ -70,18 +103,9 @@ export const handler: Handler = async (event) => {
     }
   }
 
-  if (event.path.endsWith('/oauth/url')) {
-    const scope = 'boards:read,pins:read,pins:write,user_accounts:read,boards:write';
-    const authUrl = `https://www.pinterest.com/oauth/?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=${scope}`;
-    
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ url: authUrl }),
-    };
-  }
-
   return {
     statusCode: 404,
+    headers,
     body: JSON.stringify({ error: 'Not found' }),
   };
 };

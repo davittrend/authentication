@@ -6,7 +6,7 @@ import { Footer } from '../components/Footer';
 import { useAuth } from '../hooks/useAuth';
 
 function HomePage() {
-  const { isLoading, isAuthenticated, handleAuth } = useAuth();
+  const { isLoading, isAuthenticated, userData, handleAuth, logout } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 to-pink-50">
@@ -16,8 +16,39 @@ function HomePage() {
           <div className="p-8">
             <Features isAuthenticated={isAuthenticated} />
             <div className="mt-6">
-              <AuthButton isLoading={isLoading} onClick={handleAuth} />
+              <AuthButton 
+                isLoading={isLoading}
+                isAuthenticated={isAuthenticated}
+                onClick={handleAuth}
+                onLogout={logout}
+                username={userData?.user?.username}
+              />
             </div>
+            {isAuthenticated && userData?.user && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h3 className="text-sm font-medium text-gray-900 mb-2">Account Details</h3>
+                <dl className="space-y-1">
+                  <div className="flex text-sm">
+                    <dt className="text-gray-500 w-24">Username:</dt>
+                    <dd className="text-gray-900">{userData.user.username}</dd>
+                  </div>
+                  {userData.user.first_name && (
+                    <div className="flex text-sm">
+                      <dt className="text-gray-500 w-24">Name:</dt>
+                      <dd className="text-gray-900">
+                        {`${userData.user.first_name} ${userData.user.last_name || ''}`}
+                      </dd>
+                    </div>
+                  )}
+                  {userData.user.account_type && (
+                    <div className="flex text-sm">
+                      <dt className="text-gray-500 w-24">Account Type:</dt>
+                      <dd className="text-gray-900">{userData.user.account_type}</dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            )}
             <Footer />
           </div>
         </div>
