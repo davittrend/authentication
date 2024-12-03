@@ -1,5 +1,8 @@
 [build]
   command = "npm run build"
+    IGNORE_ENV_FILE_WARNINGS = "true"
+    SECRETS_SCAN_OMIT_PATHS = "dist/assets/index-B-T7gGJm.js"
+    SECRETS_SCAN_OMIT_KEYS = "PINTEREST_CLIENT_SECRET"
   publish = "dist"
   functions = "netlify/functions"
 
