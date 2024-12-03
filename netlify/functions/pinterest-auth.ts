@@ -2,7 +2,7 @@ import { Handler } from '@netlify/functions';
 
 const clientId = '1507772';
 const clientSecret = '12e86e7dd050a39888c5e753908e80fae94f7367';
-const redirectUri = 'https://adorable-shortbread-ea235b.netlify.app/callback';
+const redirectUri = 'https://pinmaster.netlify.app/callback';
 
 // Change to sandbox URL
 const PINTEREST_API_URL = 'https://api-sandbox.pinterest.com/v5';
